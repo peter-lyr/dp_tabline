@@ -284,27 +284,28 @@ function M._simple_statusline_do()
   if M.simple_statusline == 1 then
     vim.opt.showtabline = 2
     vim.opt.winbar      = ''
-  elseif M.simple_statusline == 2 then
     M.HL()
+  elseif M.simple_statusline == 2 then
     vim.opt.showtabline = 0
     vim.opt.winbar      = M.winbar
-  elseif M.simple_statusline == 3 then
     M.HL()
+  elseif M.simple_statusline == 3 then
     vim.opt.showtabline = 2
     vim.opt.winbar      = M.winbar
-  elseif M.simple_statusline == 4 then
     M.HL()
+  elseif M.simple_statusline == 4 then
     vim.opt.showtabline = 0
     vim.opt.winbar      = ''
   end
 end
 
 function M.simple_statusline_toggle()
-  M._simple_statusline_do()
   M.simple_statusline = M.simple_statusline + 1
   if M.simple_statusline > 4 then
     M.simple_statusline = 1
   end
+  M._simple_statusline_do()
+  print(M.simple_statusline)
 end
 
 M.timer_temp = B.set_interval(100, function()
