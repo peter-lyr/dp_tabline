@@ -20,14 +20,6 @@ M.simple_statusline = 3
 
 M.winbar = "%1@SwitchWindow@%{v:lua.WinbarFname(expand('%'))} %= %{v:lua.WinbarProjRoot(expand('%'))}"
 
-M.donot_change_fts = {
-  'NvimTree',
-  'aerial',
-  'qf',
-  'fugitive',
-  'minimap',
-}
-
 M.tabhiname = 'tbltab'
 M.light = require 'nvim-web-devicons.icons-default'.icons_by_file_extension
 
