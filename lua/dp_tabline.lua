@@ -11,19 +11,20 @@ if B.check_plugins {
   return
 end
 
-M.proj_bufs = {}
-M.proj_buf = {}
-M.cur_proj = ''
-M.cur_buf = 0
+M.proj_bufs           = {}
+M.proj_buf            = {}
+M.cur_proj            = ''
+M.cur_buf             = 0
 
-M.simple_statusline = 3
+M.simple_statusline   = 3
 
-M.winbar = "%1@SwitchWindow@%{v:lua.WinbarFname(expand('%'))} %= %{v:lua.WinbarProjRoot(expand('%'))}"
+M.winbar              = "%1@SwitchWindow@%{v:lua.WinbarFname(expand('%'))} %= %{v:lua.WinbarProjRoot(expand('%'))}"
+vim.opt.statusline    = [[%<%#Title#%{v:lua.StatusLineFname()} %h%m%r %#Character#%{mode()} %#Normal#%=%<%-14.(%l,%c%V%) %P]]
 
-M.tabhiname = 'tbltab'
-M.light = require 'nvim-web-devicons.icons-default'.icons_by_file_extension
+M.tabhiname           = 'tbltab'
+M.light               = require 'nvim-web-devicons.icons-default'.icons_by_file_extension
 
-M.color_table = {
+M.color_table         = {
   ['0'] = '0x5',
   ['1'] = '0x6',
   ['2'] = '0x7',
@@ -42,17 +43,55 @@ M.color_table = {
   ['f'] = '0x4',
 }
 
-M.color_cnt = 0
-M.color_max = 50
+M.color_cnt           = 0
+M.color_max           = 50
 
 M.projs_diff_tabs_way = {}
 
-M.bufs_to_show_last = {}
-M.cur_buf_last = 1
+M.bufs_to_show_last   = {}
+M.cur_buf_last        = 1
 
-M.tabs_way = 2
+M.tabs_way            = 2
 
-M.window_equal = {}
+M.window_equal        = {}
+
+function WinbarFname(fname)
+  local temp = vim.fn.deepcopy(fname)
+  fname = B.rep_backslash_lower(vim.fn.fnamemodify(vim.fn.expand(fname), ':p'))
+  local projroot = B.rep_backslash_lower(vim.fn['ProjectRootGet'](fname))
+  if B.is(projroot) and string.sub(fname, 1, #projroot) == projroot then
+    return string.sub(fname, #projroot + 2, #fname)
+  end
+  return temp
+end
+
+function WinbarProjRoot(fname)
+  if not B.file_exists(fname) then
+    return ''
+  end
+  local projroot = vim.fn['ProjectRootGet'](fname)
+  if B.is(projroot) then
+    return string.format('%s ', B.rep_backslash_lower(projroot))
+  end
+  return '[not a proj]'
+end
+
+function GetWinbarFname(fname)
+  WinbarRoot = ''
+  fname = vim.fn.fnamemodify(fname, ':p')
+  if B.is_file(fname) == 1 then
+    WinbarRoot = B.rep_backslash_lower(vim.fn['ProjectRootGet'](fname))
+  end
+  return B.get_relative_fname(fname, WinbarRoot)
+end
+
+function GetWinbarRoot()
+  return WinbarRoot
+end
+
+function StatusLineFname()
+  return string.gsub(vim.api.nvim_buf_get_name(0), '\\', '/')
+end
 
 function M._get_root_short(project_root_path)
   local temp__ = vim.fn.tolower(vim.fn.fnamemodify(project_root_path, ':t'))
