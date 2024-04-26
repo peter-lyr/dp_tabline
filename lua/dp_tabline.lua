@@ -19,7 +19,7 @@ M.cur_buf             = 0
 
 M.simple_statusline   = 3
 
-M.winbar              = "%1@SwitchWindow@%{v:lua.WinbarFname(expand('%'))} %= %{v:lua.WinbarProjRoot(expand('%'))}"
+M.winbar              = " %1@SwitchWindow@%{v:lua.WinbarFname(expand('%'))} %= %{v:lua.WinbarProjRoot(expand('%'))}"
 vim.opt.statusline    = [[%<%#Title#%{v:lua.StatusLineFname()} %h%m%r %#Character#%{mode()} %#Normal#%=%<%-14.(%l,%c%V%) %P]]
 
 M.tabhiname           = 'tbltab'
