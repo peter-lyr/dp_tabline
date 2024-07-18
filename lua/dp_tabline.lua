@@ -357,7 +357,7 @@ end
 function M.titlestring(ev)
   pcall(vim.call, 'ProjectRootCD')
   local project = B.rep(vim.fn['ProjectRootGet'](vim.api.nvim_buf_get_name(ev.buf)))
-  local titlestring = string.format('%s %s', B.get_short(B.get_only_name(project), 3), B.get_short(vim.fn['gitbranch#name'](), 5))
+  local titlestring = string.format('%s/%s %s', B.get_short(B.get_only_name(B.file_parent(project)), 1), B.get_short(B.get_only_name(project), 3), B.get_short(vim.fn['gitbranch#name'](), 5))
   if vim.api.nvim_buf_get_option(ev.buf, 'buftype') == 'terminal' then
     local temp = string.match(vim.fn.bufname(), 'term:.+//%d+:(.+)')
     temp = vim.fn.fnamemodify(temp, ':t:r')
