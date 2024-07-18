@@ -8,6 +8,7 @@ if B.check_plugins {
       -- 'git@github.com:peter-lyr/dp_init',
       'folke/which-key.nvim',
       'git@github.com:peter-lyr/dp_nvimtree',
+      'itchyny/vim-gitbranch',
     } then
   return
 end
@@ -356,7 +357,7 @@ end
 function M.titlestring(ev)
   pcall(vim.call, 'ProjectRootCD')
   local project = B.rep(vim.fn['ProjectRootGet'](vim.api.nvim_buf_get_name(ev.buf)))
-  local titlestring = string.format('%s %s', M._get_root_short(project), vim.fn.fnamemodify(vim.fn.bufname(ev.buf), ':t'))
+  local titlestring = string.format('%s %s', B.get_short(B.get_only_name(project), 3), B.get_short(vim.fn['gitbranch#name'](), 5))
   if vim.api.nvim_buf_get_option(ev.buf, 'buftype') == 'terminal' then
     local temp = string.match(vim.fn.bufname(), 'term:.+//%d+:(.+)')
     temp = vim.fn.fnamemodify(temp, ':t:r')
