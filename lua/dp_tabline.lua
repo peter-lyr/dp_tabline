@@ -57,26 +57,7 @@ M.tabs_way            = 2
 
 M.window_equal        = {}
 
-function WinbarFname(fname)
-  local temp = vim.fn.deepcopy(fname)
-  fname = B.rep_backslash_lower(vim.fn.fnamemodify(vim.fn.expand(fname), ':p'))
-  local projroot = B.rep_backslash_lower(vim.fn['ProjectRootGet'](fname))
-  if B.is(projroot) and string.sub(fname, 1, #projroot) == projroot then
-    return string.sub(fname, #projroot + 2, #fname)
-  end
-  return temp
-end
-
-function WinbarProjRoot(fname)
-  if not B.file_exists(fname) then
-    return ''
-  end
-  local projroot = vim.fn['ProjectRootGet'](fname)
-  if B.is(projroot) then
-    return string.format('%s ', B.rep_backslash_lower(projroot))
-  end
-  return '[not a proj]'
-end
+M.winbar_fname_len = 1
 
 function GetWinbarFname(fname)
   WinbarRoot = ''
@@ -297,20 +278,25 @@ function WinbarFname(fname)
   fname = B.rep(vim.fn.fnamemodify(vim.fn.expand(fname), ':p'))
   local projroot = B.rep(vim.fn['ProjectRootGet'](fname))
   if B.is(projroot) and string.sub(fname, 1, #projroot) == projroot then
-    return string.sub(fname, #projroot + 2, #fname)
+    temp = string.sub(fname, #projroot + 2, #fname)
   end
+  M.winbar_fname_len = #temp
   return temp
 end
 
 function WinbarProjRoot(fname)
+  local temp = ''
   if not B.file_exists(fname) then
-    return ''
+    return temp
   end
+  local wnr = vim.fn.bufwinnr(vim.fn.bufnr(fname))
+  temp = '[not a proj]'
   local projroot = vim.fn['ProjectRootGet'](fname)
   if B.is(projroot) then
-    return string.format('%s ', B.rep(projroot))
+    temp = B.rep(projroot)
   end
-  return '[not a proj]'
+  temp = string.format('%s ', B.get_short(temp, (vim.fn.winwidth(wnr) - 6 - M.winbar_fname_len) / 2))
+  return temp
 end
 
 function M._simple_statusline_do()
