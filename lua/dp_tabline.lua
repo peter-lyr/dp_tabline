@@ -21,7 +21,22 @@ M.cur_buf             = 0
 M.simple_statusline   = 3
 
 M.winbar              = " %1@SwitchWindow@%{v:lua.WinbarFname(expand('%'))} %= %{v:lua.WinbarProjRoot(expand('%'))}"
-vim.opt.statusline    = [[%<%#Normal#%{v:lua.SLPH()}/%#tbltab#%{v:lua.SLPT()}/%#Normal#%{v:lua.SLH()}/%#Title#%{v:lua.SLT()} %h%m%r %#Character#%{mode()} %#tbltab#%{gitbranch#name()} %#Normal#%=%<%-14.(%l,%c%V%) %P]]
+M.statusline          = [[]]
+M.statusline          = M.statusline .. [[%<]]
+M.statusline          = M.statusline .. [[%#Normal#%{v:lua.SLPH()}]]
+M.statusline          = M.statusline .. [[%#tbltab#%{v:lua.SLPT()}]]
+M.statusline          = M.statusline .. [[%#Normal#%{v:lua.SLH()}]]
+M.statusline          = M.statusline .. [[%#Title#%{v:lua.SLR()}]]
+M.statusline          = M.statusline .. [[%#Number#%{v:lua.SLE()}]]
+M.statusline          = M.statusline .. [[%#Normal# %h%m%r ]]
+M.statusline          = M.statusline .. [[%#Character#%{mode()} ]]
+M.statusline          = M.statusline .. [[%#tbltab#%{gitbranch#name()} ]]
+M.statusline          = M.statusline .. [[%#Normal#]]
+M.statusline          = M.statusline .. [[%=]]
+M.statusline          = M.statusline .. [[%<]]
+M.statusline          = M.statusline .. [[%-14.(%l,%c%V%) ]]
+M.statusline          = M.statusline .. [[%P]]
+vim.opt.statusline    = M.statusline
 
 M.tabhiname           = 'tbltab'
 M.light               = require 'nvim-web-devicons.icons-default'.icons_by_file_extension
@@ -72,12 +87,23 @@ end
 
 function SLPH()
   local fullname = B.rep_slash(vim.api.nvim_buf_get_name(0))
-  local projroot = B.rep_slash(B.get_proj_root())
-  local fname = string.sub(fullname, #projroot+2, #fullname)
-  M.projhead = B.rep_slash(B.file_parent(projroot))
-  M.projtail = B.get_only_name(projroot)
-  M.fnamehead = vim.fn.fnamemodify(fname, ':h')
-  M.fnametail = vim.fn.fnamemodify(fname, ':t')
+  local projroot = B.get_proj_root()
+  projroot = B.rep_slash(projroot)
+  if B.is(projroot) then
+    local fname = string.sub(fullname, #projroot + 2, #fullname)
+    local fnametail = vim.fn.fnamemodify(fname, ':t')
+    M.projhead = B.rep_slash(B.file_parent(projroot)) .. '/'
+    M.projtail = B.get_only_name(projroot) .. '/'
+    M.fnamehead = vim.fn.fnamemodify(fname, ':h') .. '/'
+    M.fnametail_root = vim.fn.fnamemodify(fnametail, ':r') .. '.'
+    M.fnametail_extension = vim.fn.fnamemodify(fnametail, ':e')
+  else
+    M.projhead = fullname
+    M.projtail = ''
+    M.fnamehead = ''
+    M.fnametail_root = ''
+    M.fnametail_extension = ''
+  end
   return M.projhead
 end
 
@@ -89,8 +115,12 @@ function SLH()
   return M.fnamehead
 end
 
-function SLT()
-  return M.fnametail
+function SLR()
+  return M.fnametail_root
+end
+
+function SLE()
+  return M.fnametail_extension
 end
 
 function M._get_root_short(project_root_path)
