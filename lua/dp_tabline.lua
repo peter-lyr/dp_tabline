@@ -57,8 +57,6 @@ M.tabs_way            = 2
 
 M.window_equal        = {}
 
-M.winbar_fname_len = 1
-
 function GetWinbarFname(fname)
   WinbarRoot = ''
   fname = vim.fn.fnamemodify(fname, ':p')
@@ -280,7 +278,6 @@ function WinbarFname(fname)
   if B.is(projroot) and string.sub(fname, 1, #projroot) == projroot then
     temp = string.sub(fname, #projroot + 2, #fname)
   end
-  M.winbar_fname_len = #temp
   return temp
 end
 
@@ -295,7 +292,7 @@ function WinbarProjRoot(fname)
   if B.is(projroot) then
     temp = B.rep(projroot)
   end
-  temp = string.format('%s ', B.get_short(temp, (vim.fn.winwidth(wnr) - 6 - M.winbar_fname_len) / 2))
+  temp = string.format('%s ', B.get_short(temp, (vim.fn.winwidth(wnr) - 6 - #WinbarFname(fname)) / 2))
   return temp
 end
 
