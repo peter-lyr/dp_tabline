@@ -21,7 +21,7 @@ M.cur_buf             = 0
 M.simple_statusline   = 3
 
 M.winbar              = " %1@SwitchWindow@%{v:lua.WinbarFname(expand('%'))} %= %{v:lua.WinbarProjRoot(expand('%'))}"
-vim.opt.statusline    = [[%<%#Title#%{v:lua.StatusLineFname()} %h%m%r %#Character#%{mode()} %#Normal#%=%<%-14.(%l,%c%V%) %P]]
+vim.opt.statusline    = [[%<%#Title#%{v:lua.StatusLineFname()} %h%m%r %#Character#%{mode()} %#tbltab#%{gitbranch#name()} %#Normal#%=%<%-14.(%l,%c%V%) %P]]
 
 M.tabhiname           = 'tbltab'
 M.light               = require 'nvim-web-devicons.icons-default'.icons_by_file_extension
