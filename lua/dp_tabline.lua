@@ -21,7 +21,7 @@ M.cur_buf             = 0
 M.simple_statusline   = 3
 
 M.winbar              = " %1@SwitchWindow@%{v:lua.WinbarFname(expand('%'))} %= %{v:lua.WinbarProjRoot(expand('%'))}"
-vim.opt.statusline    = [[%<%#Title#%{v:lua.StatusLineFname()} %h%m%r %#Character#%{mode()} %#tbltab#%{gitbranch#name()} %#Normal#%=%<%-14.(%l,%c%V%) %P]]
+vim.opt.statusline    = [[%<%#Normal#%{v:lua.StatusLineFnameProjHead()}/%#tbltab#%{v:lua.StatusLineFnameProjTail()}/%#Normal#%{v:lua.StatusLineFnameHead()}/%#Title#%{v:lua.StatusLineFnameTail()} %h%m%r %#Character#%{mode()} %#tbltab#%{gitbranch#name()} %#Normal#%=%<%-14.(%l,%c%V%) %P]]
 
 M.tabhiname           = 'tbltab'
 M.light               = require 'nvim-web-devicons.icons-default'.icons_by_file_extension
@@ -70,8 +70,27 @@ function GetWinbarRoot()
   return WinbarRoot
 end
 
-function StatusLineFname()
-  return string.gsub(vim.api.nvim_buf_get_name(0), '\\', '/')
+function StatusLineFnameProjHead()
+  local fullname = B.rep_slash(vim.api.nvim_buf_get_name(0))
+  local projroot = B.rep_slash(B.get_proj_root())
+  local fname = string.sub(fullname, #projroot+2, #fullname)
+  M.projhead = B.rep_slash(B.file_parent(projroot))
+  M.projtail = B.get_only_name(projroot)
+  M.fnamehead = vim.fn.fnamemodify(fname, ':h')
+  M.fnametail = vim.fn.fnamemodify(fname, ':t')
+  return M.projhead
+end
+
+function StatusLineFnameProjTail()
+  return M.projtail
+end
+
+function StatusLineFnameHead()
+  return M.fnamehead
+end
+
+function StatusLineFnameTail()
+  return M.fnametail
 end
 
 function M._get_root_short(project_root_path)
