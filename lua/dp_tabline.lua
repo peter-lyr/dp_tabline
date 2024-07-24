@@ -89,6 +89,12 @@ end
 
 function SLPH__1()
   local fullname = B.rep_slash(vim.api.nvim_buf_get_name(0))
+  if M.fullname_back == fullname then
+    if M.projhead__1 then
+      return M.projhead__1
+    end
+  end
+  M.fullname_back = fullname
   local projroot = B.get_proj_root()
   projroot = B.rep_slash(projroot)
   M.projhead__1 = ''
