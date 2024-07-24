@@ -121,8 +121,11 @@ function SLPH__1()
     if M.fnamehead == './' then
       M.fnamehead = ''
     end
-    M.fnametail_root = vim.fn.fnamemodify(fnametail, ':r') .. '.'
+    M.fnametail_root = vim.fn.fnamemodify(fnametail, ':r')
     M.fnametail_extension = vim.fn.fnamemodify(fnametail, ':e')
+    if M.fnametail_extension ~= '' then
+      M.fnametail_root = M.fnametail_root .. '.'
+    end
   end
   return M.projhead__1
 end
