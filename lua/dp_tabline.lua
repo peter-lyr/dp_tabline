@@ -420,12 +420,12 @@ end
 function M.titlestring(ev)
   pcall(vim.call, 'ProjectRootCD')
   local project = B.rep(vim.fn['ProjectRootGet'](vim.api.nvim_buf_get_name(ev.buf)))
-  local temp1 = B.get_short(B.get_only_name(B.file_parent(project)), 1, '.')
-  local temp2 = B.get_short(B.get_only_name(project), 3, '.')
-  local temp3 = ' ' .. B.get_short(vim.fn['gitbranch#name'](), 5, '.')
-  local titlestring = string.format('%s/%s%s', temp1, temp2, temp3)
-  if temp2 == '.' or temp2 == '' then
-    titlestring = string.format('%s%s', temp1, temp3)
+  local root_head = B.get_short(B.get_only_name(B.file_parent(project)), 1, '.')
+  local root = B.get_short(B.get_only_name(project), 3, '.')
+  local branchname = ' ' .. B.get_short(vim.fn['gitbranch#name'](), 5, '.')
+  local titlestring = string.format('%s/%s%s', root_head, root, branchname)
+  if root == '.' or root == '' then
+    titlestring = string.format('%s%s', root_head, branchname)
   end
   if vim.api.nvim_buf_get_option(ev.buf, 'buftype') == 'terminal' then
     local temp = string.match(vim.fn.bufname(), 'term:.+//%d+:(.+)')
