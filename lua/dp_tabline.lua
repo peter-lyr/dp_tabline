@@ -420,9 +420,9 @@ end
 function M.titlestring(ev)
   pcall(vim.call, 'ProjectRootCD')
   local project = B.rep(vim.fn['ProjectRootGet'](vim.api.nvim_buf_get_name(ev.buf)))
-  local temp1 = B.get_short(B.get_only_name(B.file_parent(project)), 3)
-  local temp2 = B.get_short(B.get_only_name(project), 3)
-  local temp3 = ' ' .. B.get_short(vim.fn['gitbranch#name'](), 5)
+  local temp1 = B.get_short(B.get_only_name(B.file_parent(project)), 1, '.')
+  local temp2 = B.get_short(B.get_only_name(project), 3, '.')
+  local temp3 = ' ' .. B.get_short(vim.fn['gitbranch#name'](), 5, '.')
   local titlestring = string.format('%s/%s%s', temp1, temp2, temp3)
   if temp2 == '.' or temp2 == '' then
     titlestring = string.format('%s%s', temp1, temp3)
