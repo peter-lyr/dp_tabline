@@ -6,7 +6,7 @@ if not sta then return print('Dp_base is required!', debug.getinfo(1)['source'])
 
 if B.check_plugins {
       -- 'git@github.com:peter-lyr/dp_init',
-      'folke/which-key.nvim',
+      -- 'folke/which-key.nvim',
       'git@github.com:peter-lyr/dp_nvimtree',
       'itchyny/vim-gitbranch',
     } then
@@ -21,24 +21,6 @@ M.cur_buf             = 0
 M.simple_statusline   = 3
 
 M.winbar              = " %1@SwitchWindow@%{v:lua.WinbarFname(expand('%'))} %= %{v:lua.WinbarProjRoot(expand('%'))}"
-M.statusline          = [[]]
-M.statusline          = M.statusline .. [[%<]]
-M.statusline          = M.statusline .. [[%#Normal#%{v:lua.SLPH__1()}]]
-M.statusline          = M.statusline .. [[%#tbltab#%{v:lua.SLPT__1()}]]
-M.statusline          = M.statusline .. [[%#Normal#%{v:lua.SLPH()}]]
-M.statusline          = M.statusline .. [[%#tbltab#%{v:lua.SLPT()}]]
-M.statusline          = M.statusline .. [[%#Normal#%{v:lua.SLH()}]]
-M.statusline          = M.statusline .. [[%#Title#%{v:lua.SLR()}]]
-M.statusline          = M.statusline .. [[%#Number#%{v:lua.SLE()}]]
-M.statusline          = M.statusline .. [[%#Normal# %h%m%r ]]
-M.statusline          = M.statusline .. [[%#Character#%{mode()} ]]
-M.statusline          = M.statusline .. [[%#tbltab#%{gitbranch#name()} ]]
-M.statusline          = M.statusline .. [[%#Normal#]]
-M.statusline          = M.statusline .. [[%=]]
-M.statusline          = M.statusline .. [[%<]]
-M.statusline          = M.statusline .. [[%-14.(%l,%c%V%) ]]
-M.statusline          = M.statusline .. [[%P]]
-vim.opt.statusline    = M.statusline
 
 M.tabhiname           = 'tbltab'
 M.light               = require 'nvim-web-devicons.icons-default'.icons_by_file_extension
@@ -73,6 +55,89 @@ M.cur_buf_last        = 1
 M.tabs_way            = 2
 
 M.window_equal        = {}
+
+function M.get_head_root_tail(file)
+  -- print("file:", file)
+  local head_root = B.rep_slash(B.get_proj_root(file))
+  if #head_root > 0 then
+    local tail = string.sub(file, #head_root + 2, #file)
+    local head = vim.fn.fnamemodify(head_root, ':h')
+    local root = vim.fn.fnamemodify(head_root, ':t')
+    -- B.print("head_root:[%s], tail:[%s]", head_root, tail)
+    -- B.print('head_root:[%s], head:[%s], root:[%s], tail:[%s]', head_root, head, root, tail)
+    return head, root, tail
+  end
+  return nil, nil, nil
+end
+
+-- M.get_head_root_tail(B.buf_get_name())
+-- M.get_head_root_tail([[C:\Users\llydr\AppData\Local\nvim-data\lazy\plugins\dp_tabline]])
+-- M.get_head_root_tail([[c:/users/llydr/appdata/local/nvim-data/lazy/plugins]])
+
+B.aucmd('BufEnter', 'tabline.BufEnter.statusline', {
+  callback = function(ev)
+    local statuslines = { '%<', }
+    local file        = B.rep_slash(ev.file)
+    local temps = {}
+    while 1 do
+      local head, root, tail = M.get_head_root_tail(file)
+      if head and root and tail then
+        local temp = {}
+        temp[#temp + 1] = '%#Normal#' .. head .. '/'
+        temp[#temp + 1] = '%#tbltab#' .. root .. '%#Normal#/'
+        temp[#temp + 1] = '%#Normal#' .. tail
+        temps[#temps + 1] = temp
+        file = head
+      else
+        break
+      end
+    end
+    if #temps > 0 then
+      statuslines[#statuslines + 1] = temps[#temps][1]
+      for i=#temps, 1, -1 do
+        local temp = temps[i]
+        for c, j in ipairs(temp) do
+          if c ~= 1 then
+            statuslines[#statuslines + 1] = j
+          end
+        end
+        if i == 1 then
+          local _temp = statuslines[#statuslines]
+          table.remove(statuslines, #statuslines)
+          print("_temp:", _temp)
+          _temp = string.sub(_temp, #'%#Normal#' + 1, #_temp)
+          print("_temp:", _temp)
+          local head = vim.fn.fnamemodify(_temp, ':h')
+          print("head:", head)
+          local tail = vim.fn.fnamemodify(_temp, ':t')
+          print("tail:", tail)
+          local extension = vim.fn.fnamemodify(tail, ':e')
+          print("extension:", extension)
+          tail = vim.fn.fnamemodify(tail, ':r')
+          print("tail:", tail)
+          if head ~= '.' then
+            statuslines[#statuslines] = head .. '/'
+          end
+          if tail ~= '' then
+            statuslines[#statuslines + 1] = '%#Title#' .. tail .. '.'
+          end
+          statuslines[#statuslines + 1] = '%#Number#' .. extension
+        else
+          statuslines[#statuslines + 1] = '/'
+        end
+      end
+    else
+      statuslines[#statuslines + 1] = '%#Normal#' .. file
+    end
+    statuslines[#statuslines + 1] = '%#Normal# %h%m%r '
+    statuslines[#statuslines + 1] = '%#Character#%{mode()} '
+    statuslines[#statuslines + 1] = '%#tbltab#%{gitbranch#name()} '
+    statuslines[#statuslines + 1] = '%#Normal#%=%<'
+    statuslines[#statuslines + 1] = '%-14.(%l,%c%V%) '
+    statuslines[#statuslines + 1] = '%P'
+    vim.opt.statusline = vim.fn.join(statuslines, '')
+  end,
+})
 
 function GetWinbarFname(fname)
   WinbarRoot = ''
