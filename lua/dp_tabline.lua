@@ -112,11 +112,16 @@ function SLPH__1()
     if B.is(projroot__1) then
       M.projhead__1 = B.rep_slash(B.file_parent(projroot__1)) .. '/'
       M.projtail__1 = B.get_only_name(projroot__1) .. '/'
-      M.projhead = string.sub(projroot, #projroot__1 + 2, #projroot) .. '/'
+      M.projhead = string.sub(projroot, #projroot__1 + 2, #projroot)
+      M.projtail = vim.fn.fnamemodify(M.projhead, ':t') .. '/'
+      M.projhead = vim.fn.fnamemodify(M.projhead, ':h') .. '/'
+      if M.projhead == './' then
+        M.projhead = ''
+      end
     else
       M.projhead = B.rep_slash(B.file_parent(projroot)) .. '/'
+      M.projtail = B.get_only_name(projroot) .. '/'
     end
-    M.projtail = B.get_only_name(projroot) .. '/'
     M.fnamehead = vim.fn.fnamemodify(fname, ':h') .. '/'
     if M.fnamehead == './' then
       M.fnamehead = ''
