@@ -57,22 +57,15 @@ M.tabs_way            = 2
 M.window_equal        = {}
 
 function M.get_head_root_tail(file)
-  -- print("file:", file)
   local head_root = B.rep_slash(B.get_proj_root(file))
   if #head_root > 0 then
     local tail = string.sub(file, #head_root + 2, #file)
     local head = vim.fn.fnamemodify(head_root, ':h')
     local root = vim.fn.fnamemodify(head_root, ':t')
-    -- B.print("head_root:[%s], tail:[%s]", head_root, tail)
-    -- B.print('head_root:[%s], head:[%s], root:[%s], tail:[%s]', head_root, head, root, tail)
     return head, root, tail
   end
   return nil, nil, nil
 end
-
--- M.get_head_root_tail(B.buf_get_name())
--- M.get_head_root_tail([[C:\Users\llydr\AppData\Local\nvim-data\lazy\plugins\dp_tabline]])
--- M.get_head_root_tail([[c:/users/llydr/appdata/local/nvim-data/lazy/plugins]])
 
 B.aucmd('BufEnter', 'tabline.BufEnter.statusline', {
   callback = function(ev)
@@ -104,19 +97,13 @@ B.aucmd('BufEnter', 'tabline.BufEnter.statusline', {
         if i == 1 then
           local _temp = statuslines[#statuslines]
           table.remove(statuslines, #statuslines)
-          print("_temp:", _temp)
           _temp = string.sub(_temp, #'%#Normal#' + 1, #_temp)
-          print("_temp:", _temp)
           local head = vim.fn.fnamemodify(_temp, ':h')
-          print("head:", head)
           local tail = vim.fn.fnamemodify(_temp, ':t')
-          print("tail:", tail)
           local extension = vim.fn.fnamemodify(tail, ':e')
-          print("extension:", extension)
           tail = vim.fn.fnamemodify(tail, ':r')
-          print("tail:", tail)
           if head ~= '.' then
-            statuslines[#statuslines] = head .. '/'
+            statuslines[#statuslines + 1] = head .. '/'
           end
           if tail ~= '' then
             statuslines[#statuslines + 1] = '%#Title#' .. tail .. '.'
@@ -150,78 +137,6 @@ end
 
 function GetWinbarRoot()
   return WinbarRoot
-end
-
-function SLPH__1()
-  local fullname = B.rep_slash(vim.api.nvim_buf_get_name(0))
-  if M.fullname_back == fullname then
-    if M.projhead__1 then
-      return M.projhead__1
-    end
-  end
-  M.fullname_back = fullname
-  local projroot = B.get_proj_root()
-  projroot = B.rep_slash(projroot)
-  M.projhead__1 = ''
-  M.projtail__1 = ''
-  M.projhead = fullname
-  M.projtail = ''
-  M.fnamehead = ''
-  M.fnametail_root = ''
-  M.fnametail_extension = ''
-  if B.is(projroot) then
-    local projroot__1 = B.get_proj_root(B.file_parent(projroot))
-    B.get_file_dirs(projroot)
-    local fname = string.sub(fullname, #projroot + 2, #fullname)
-    local fnametail = vim.fn.fnamemodify(fname, ':t')
-    if B.is(projroot__1) then
-      M.projhead__1 = B.rep_slash(B.file_parent(projroot__1)) .. '/'
-      M.projtail__1 = B.get_only_name(projroot__1) .. '/'
-      M.projhead = string.sub(projroot, #projroot__1 + 2, #projroot)
-      M.projtail = vim.fn.fnamemodify(M.projhead, ':t') .. '/'
-      M.projhead = vim.fn.fnamemodify(M.projhead, ':h') .. '/'
-      if M.projhead == './' then
-        M.projhead = ''
-      end
-    else
-      M.projhead = B.rep_slash(B.file_parent(projroot)) .. '/'
-      M.projtail = B.get_only_name(projroot) .. '/'
-    end
-    M.fnamehead = vim.fn.fnamemodify(fname, ':h') .. '/'
-    if M.fnamehead == './' then
-      M.fnamehead = ''
-    end
-    M.fnametail_root = vim.fn.fnamemodify(fnametail, ':r')
-    M.fnametail_extension = vim.fn.fnamemodify(fnametail, ':e')
-    if M.fnametail_extension ~= '' then
-      M.fnametail_root = M.fnametail_root .. '.'
-    end
-  end
-  return M.projhead__1
-end
-
-function SLPT__1()
-  return M.projtail__1
-end
-
-function SLPH()
-  return M.projhead
-end
-
-function SLPT()
-  return M.projtail
-end
-
-function SLH()
-  return M.fnamehead
-end
-
-function SLR()
-  return M.fnametail_root
-end
-
-function SLE()
-  return M.fnametail_extension
 end
 
 function M._get_root_short(project_root_path)
