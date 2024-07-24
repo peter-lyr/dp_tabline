@@ -23,6 +23,8 @@ M.simple_statusline   = 3
 M.winbar              = " %1@SwitchWindow@%{v:lua.WinbarFname(expand('%'))} %= %{v:lua.WinbarProjRoot(expand('%'))}"
 M.statusline          = [[]]
 M.statusline          = M.statusline .. [[%<]]
+M.statusline          = M.statusline .. [[%#Normal#%{v:lua.SLPH__1()}]]
+M.statusline          = M.statusline .. [[%#tbltab#%{v:lua.SLPT__1()}]]
 M.statusline          = M.statusline .. [[%#Normal#%{v:lua.SLPH()}]]
 M.statusline          = M.statusline .. [[%#tbltab#%{v:lua.SLPT()}]]
 M.statusline          = M.statusline .. [[%#Normal#%{v:lua.SLH()}]]
@@ -85,25 +87,43 @@ function GetWinbarRoot()
   return WinbarRoot
 end
 
-function SLPH()
+function SLPH__1()
   local fullname = B.rep_slash(vim.api.nvim_buf_get_name(0))
   local projroot = B.get_proj_root()
   projroot = B.rep_slash(projroot)
+  M.projhead__1 = ''
+  M.projtail__1 = ''
+  M.projhead = fullname
+  M.projtail = ''
+  M.fnamehead = ''
+  M.fnametail_root = ''
+  M.fnametail_extension = ''
   if B.is(projroot) then
+    local projroot__1 = B.get_proj_root(B.file_parent(projroot))
+    B.get_file_dirs(projroot)
     local fname = string.sub(fullname, #projroot + 2, #fullname)
     local fnametail = vim.fn.fnamemodify(fname, ':t')
+    if B.is(projroot__1) then
+      M.projhead__1 = B.rep_slash(B.file_parent(projroot__1)) .. '/'
+      M.projtail__1 = B.get_only_name(projroot__1) .. '/'
+    end
     M.projhead = B.rep_slash(B.file_parent(projroot)) .. '/'
     M.projtail = B.get_only_name(projroot) .. '/'
     M.fnamehead = vim.fn.fnamemodify(fname, ':h') .. '/'
+    if M.fnamehead == './' then
+      M.fnamehead = ''
+    end
     M.fnametail_root = vim.fn.fnamemodify(fnametail, ':r') .. '.'
     M.fnametail_extension = vim.fn.fnamemodify(fnametail, ':e')
-  else
-    M.projhead = fullname
-    M.projtail = ''
-    M.fnamehead = ''
-    M.fnametail_root = ''
-    M.fnametail_extension = ''
   end
+  return M.projhead__1
+end
+
+function SLPT__1()
+  return M.projtail__1
+end
+
+function SLPH()
   return M.projhead
 end
 
