@@ -56,6 +56,8 @@ M.tabs_way            = 2
 
 M.window_equal        = {}
 
+M.bufs_root = 'git'
+
 function M.get_head_root_tail(file)
   local head_root = B.rep_slash(B.get_proj_root(file))
   if #head_root > 0 then
@@ -619,9 +621,23 @@ function M._is_buf_to_show(buf)
   return true
 end
 
+function M.toggle_bufs_root()
+  if M.bufs_root == 'proj' then
+    M.bufs_root = 'git'
+  else
+    M.bufs_root = 'proj'
+  end
+  B.notify_info(M.bufs_root)
+end
+
 function M.update_bufs()
   M.cur_buf = ev and ev.buf or vim.fn.bufnr()
-  local cur_proj = B.rep(vim.fn['ProjectRootGet'](vim.api.nvim_buf_get_name(M.cur_buf)))
+  local cur_proj = ''
+  if M.bufs_root == 'proj' then
+    cur_proj = B.rep(vim.fn['ProjectRootGet'](vim.api.nvim_buf_get_name(M.cur_buf)))
+  else
+    cur_proj = B.rep(B.get_file_git_root(vim.api.nvim_buf_get_name(M.cur_buf)))
+  end
   if not B.is(M._is_buf_to_show(M.cur_buf)) then
     M.cur_proj = cur_proj
     return
@@ -630,7 +646,12 @@ function M.update_bufs()
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do
     local file = B.rep(vim.api.nvim_buf_get_name(buf))
     if B.is(M._is_buf_to_show(buf)) then
-      local proj = B.rep(vim.fn['ProjectRootGet'](file))
+        local proj = ''
+      if M.bufs_root == 'proj' then
+        proj = B.rep(vim.fn['ProjectRootGet'](file))
+      else
+        proj = B.rep(B.get_file_git_root(file))
+      end
       if vim.tbl_contains(vim.tbl_keys(proj_bufs), proj) == false then
         proj_bufs[proj] = {}
       end
@@ -933,6 +954,7 @@ require 'which-key'.register {
   ['<c-s-,>'] = { function() M.bd_all_prev_buf() end, 'tabline: bwipeout all prev buf', mode = { 'n', 'v', }, silent = true, },
   ['<a-,>'] = { function() M.simple_statusline_toggle() end, 'tabline: simple statusline toggle', mode = { 'n', 'v', }, silent = true, },
   ['<a-.>'] = { function() M.toggle_tabs_way() end, 'tabline: toggle tabs way', mode = { 'n', 'v', }, silent = true, },
+  ['<a-/>'] = { function() M.toggle_bufs_root() end, 'tabline: toggle bufs root', mode = { 'n', 'v', }, silent = true, },
 }
 
 return M
