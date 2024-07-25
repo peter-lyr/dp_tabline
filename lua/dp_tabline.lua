@@ -13,19 +13,21 @@ if B.check_plugins {
   return
 end
 
-M.proj_bufs           = {}
-M.proj_buf            = {}
-M.cur_proj            = ''
-M.cur_buf             = 0
+M.source                 = B.getsource(debug.getinfo(1)['source'])
 
-M.simple_statusline   = 3
+M.proj_bufs              = {}
+M.proj_buf               = {}
+M.cur_proj               = ''
+M.cur_buf                = 0
 
-M.winbar              = " %1@SwitchWindow@%{v:lua.WinbarFname(expand('%'))} %= %{v:lua.WinbarProjRoot(expand('%'))}"
+M.simple_statusline      = 3
 
-M.tabhiname           = 'tbltab'
-M.light               = require 'nvim-web-devicons.icons-default'.icons_by_file_extension
+M.winbar                 = " %1@SwitchWindow@%{v:lua.WinbarFname(expand('%'))} %= %{v:lua.WinbarProjRoot(expand('%'))}"
 
-M.color_table         = {
+M.tabhiname              = 'tbltab'
+M.light                  = require 'nvim-web-devicons.icons-default'.icons_by_file_extension
+
+M.color_table            = {
   ['0'] = '0x5',
   ['1'] = '0x6',
   ['2'] = '0x7',
@@ -44,19 +46,24 @@ M.color_table         = {
   ['f'] = '0x4',
 }
 
-M.color_cnt           = 0
-M.color_max           = 50
+M.color_cnt              = 0
+M.color_max              = 50
 
-M.projs_diff_tabs_way = {}
+M.projs_diff_tabs_way    = {}
 
-M.bufs_to_show_last   = {}
-M.cur_buf_last        = 1
+M.bufs_to_show_last      = {}
+M.cur_buf_last           = 1
 
-M.tabs_way            = 2
+M.tabs_way               = 2
 
-M.window_equal        = {}
+M.window_equal           = {}
 
-M.bufs_root = 'git'
+M.bufs_root              = 'git'
+
+M.nvim_exe_cpu_usage_py  = B.getcreate_file(B.get_source_dot_dir(M.source), 'nvim_exe_cpu_usage.py')
+M.nvim_exe_cpu_usage_txt = B.getcreate_file(B.get_source_dot_dir(M.source), 'nvim_exe_cpu_usage.txt')
+
+B.system_run('start silent', '%s %s %s', M.nvim_exe_cpu_usage_py, vim.fn.getpid(), M.nvim_exe_cpu_usage_txt)
 
 function M.get_head_root_tail(file)
   local head_root = B.rep_slash(B.get_proj_root(file))
@@ -70,37 +77,31 @@ function M.get_head_root_tail(file)
 end
 
 function SearchWord()
-  return B.get_short(vim.fn.getreg('/'), 7)
+  return B.get_short(vim.fn.getreg '/', 7)
 end
 
--- function Cpu()
---   vim.g.pid = vim.loop.os_getpid()
---   vim.g.cpu_usage = ''
---   vim.cmd [[
---     python << EOF
--- import vim
--- import psutil
--- pid = int(vim.eval('g:pid'))
--- try:
---   cpu_usage = str(p.cpu_percent())
--- except:
---   p = psutil.Process(pid)
---   cpu_usage = str(p.cpu_percent())
--- vim.command(f"""let g:cpu_usage = {cpu_usage}""")
--- EOF
---   ]]
---   return vim.g.cpu_usage
--- end
+function Cpu()
+  local lines = vim.fn.readfile(M.nvim_exe_cpu_usage_txt)
+  return vim.fn.trim(vim.fn.join(lines, '')) .. '%'
+end
 
 function Mem()
   return string.format('%dM', vim.loop.resident_set_memory() / 1024 / 1024)
 end
 
+-- function Time()
+--   return vim.fn.strftime '%Y-%m-%d %H:%M:%S'
+-- end
+
+B.set_interval_vim_g('vim_o_ro_timer', 1000, function()
+  vim.o.ro = vim.o.ro
+end)
+
 B.aucmd('BufEnter', 'tabline.BufEnter.statusline', {
   callback = function(ev)
     local statuslines = { '%<', }
     local file        = B.rep_slash(ev.file)
-    local temps = {}
+    local temps       = {}
     while 1 do
       local head, root, tail = M.get_head_root_tail(file)
       if head and root and tail then
@@ -116,7 +117,7 @@ B.aucmd('BufEnter', 'tabline.BufEnter.statusline', {
     end
     if #temps > 0 then
       statuslines[#statuslines + 1] = temps[#temps][1]
-      for i=#temps, 1, -1 do
+      for i = #temps, 1, -1 do
         local temp = temps[i]
         for c, j in ipairs(temp) do
           if c ~= 1 then
@@ -150,7 +151,8 @@ B.aucmd('BufEnter', 'tabline.BufEnter.statusline', {
     statuslines[#statuslines + 1] = '%#tbltab#%{gitbranch#name()} '
     statuslines[#statuslines + 1] = '%#Search#%{v:lua.SearchWord()}'
     statuslines[#statuslines + 1] = '%#Normal# %{v:lua.Mem()}'
-    -- statuslines[#statuslines + 1] = '%#Normal# %{v:lua.Cpu()}'
+    -- statuslines[#statuslines + 1] = '%#Normal# %{v:lua.Time()}'
+    statuslines[#statuslines + 1] = '%#Normal# %{v:lua.Cpu()}'
     statuslines[#statuslines + 1] = '%#Normal# %=%<'
     statuslines[#statuslines + 1] = '%{&ff}[%{&fenc}] '
     statuslines[#statuslines + 1] = '%(%l/%L,%c%V%) '
@@ -646,7 +648,7 @@ function M.update_bufs()
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do
     local file = B.rep(vim.api.nvim_buf_get_name(buf))
     if B.is(M._is_buf_to_show(buf)) then
-        local proj = ''
+      local proj = ''
       if M.bufs_root == 'proj' then
         proj = B.rep(vim.fn['ProjectRootGet'](file))
       else
