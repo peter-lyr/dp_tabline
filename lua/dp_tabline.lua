@@ -150,7 +150,8 @@ B.aucmd('BufEnter', 'tabline.BufEnter.statusline', {
     statuslines[#statuslines + 1] = '%#Normal# %{v:lua.Mem()}'
     -- statuslines[#statuslines + 1] = '%#Normal# %{v:lua.Cpu()}'
     statuslines[#statuslines + 1] = '%#Normal# %=%<'
-    statuslines[#statuslines + 1] = '%-14.(%l,%c%V%) '
+    statuslines[#statuslines + 1] = '%{&ff}[%{&fenc}] '
+    statuslines[#statuslines + 1] = '%(%l/%L,%c%V%) '
     statuslines[#statuslines + 1] = '%P'
     vim.opt.statusline = vim.fn.join(statuslines, '')
   end,
