@@ -119,7 +119,8 @@ B.aucmd('BufEnter', 'tabline.BufEnter.statusline', {
     statuslines[#statuslines + 1] = '%#Normal# %h%m%r '
     statuslines[#statuslines + 1] = '%#Character#%{mode()} '
     statuslines[#statuslines + 1] = '%#tbltab#%{gitbranch#name()} '
-    statuslines[#statuslines + 1] = '%#Normal#%=%<'
+    statuslines[#statuslines + 1] = '%#Search#' .. B.get_short(vim.fn.getreg('/'), 7)
+    statuslines[#statuslines + 1] = '%#Normal# %=%<'
     statuslines[#statuslines + 1] = '%-14.(%l,%c%V%) '
     statuslines[#statuslines + 1] = '%P'
     vim.opt.statusline = vim.fn.join(statuslines, '')
