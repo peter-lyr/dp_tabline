@@ -67,6 +67,10 @@ function M.get_head_root_tail(file)
   return nil, nil, nil
 end
 
+function SearchWord()
+  return B.get_short(vim.fn.getreg('/'), 7)
+end
+
 B.aucmd('BufEnter', 'tabline.BufEnter.statusline', {
   callback = function(ev)
     local statuslines = { '%<', }
@@ -119,7 +123,7 @@ B.aucmd('BufEnter', 'tabline.BufEnter.statusline', {
     statuslines[#statuslines + 1] = '%#Normal# %h%m%r '
     statuslines[#statuslines + 1] = '%#Character#%{mode()} '
     statuslines[#statuslines + 1] = '%#tbltab#%{gitbranch#name()} '
-    statuslines[#statuslines + 1] = '%#Search#' .. B.get_short(vim.fn.getreg('/'), 7)
+    statuslines[#statuslines + 1] = '%#Search#%{v:lua.SearchWord()}'
     statuslines[#statuslines + 1] = '%#Normal# %=%<'
     statuslines[#statuslines + 1] = '%-14.(%l,%c%V%) '
     statuslines[#statuslines + 1] = '%P'
