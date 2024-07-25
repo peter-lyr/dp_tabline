@@ -71,6 +71,29 @@ function SearchWord()
   return B.get_short(vim.fn.getreg('/'), 7)
 end
 
+-- function Cpu()
+--   vim.g.pid = vim.loop.os_getpid()
+--   vim.g.cpu_usage = ''
+--   vim.cmd [[
+--     python << EOF
+-- import vim
+-- import psutil
+-- pid = int(vim.eval('g:pid'))
+-- try:
+--   cpu_usage = str(p.cpu_percent())
+-- except:
+--   p = psutil.Process(pid)
+--   cpu_usage = str(p.cpu_percent())
+-- vim.command(f"""let g:cpu_usage = {cpu_usage}""")
+-- EOF
+--   ]]
+--   return vim.g.cpu_usage
+-- end
+
+function Mem()
+  return string.format('%dM', vim.loop.resident_set_memory() / 1024 / 1024)
+end
+
 B.aucmd('BufEnter', 'tabline.BufEnter.statusline', {
   callback = function(ev)
     local statuslines = { '%<', }
@@ -124,6 +147,8 @@ B.aucmd('BufEnter', 'tabline.BufEnter.statusline', {
     statuslines[#statuslines + 1] = '%#Character#%{mode()} '
     statuslines[#statuslines + 1] = '%#tbltab#%{gitbranch#name()} '
     statuslines[#statuslines + 1] = '%#Search#%{v:lua.SearchWord()}'
+    statuslines[#statuslines + 1] = '%#Normal# %{v:lua.Mem()}'
+    -- statuslines[#statuslines + 1] = '%#Normal# %{v:lua.Cpu()}'
     statuslines[#statuslines + 1] = '%#Normal# %=%<'
     statuslines[#statuslines + 1] = '%-14.(%l,%c%V%) '
     statuslines[#statuslines + 1] = '%P'
