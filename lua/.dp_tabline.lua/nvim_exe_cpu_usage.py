@@ -3,6 +3,8 @@ import time
 
 import psutil
 
+if len(sys.argv) < 3:
+    sys.exit(1)
 pid = int(sys.argv[1])
 p = psutil.Process(pid)
 file = sys.argv[2]
