@@ -91,6 +91,21 @@ function Cpu()
   return vim.fn.trim(vim.fn.join(lines, '')) .. '%'
 end
 
+function Fsize()
+  local fsize = vim.fn.getfsize(B.buf_get_name())
+  if fsize < 1024 then
+    return string.format('%dB', fsize)
+  else
+    fsize = fsize / 1024
+    if fsize < 1024 then
+      return string.format('%.1fK', fsize)
+    else
+      fsize = fsize / 1024
+      return string.format('%.1fM', fsize)
+    end
+  end
+end
+
 function Mem()
   return string.format('%dM', vim.loop.resident_set_memory() / 1024 / 1024)
 end
@@ -158,10 +173,11 @@ B.aucmd('BufEnter', 'tabline.BufEnter.statusline', {
     statuslines[#statuslines + 1] = '%#Search#%{v:lua.SearchWord()}'
     statuslines[#statuslines + 1] = '%#Normal# %{v:lua.Mem()}'
     -- statuslines[#statuslines + 1] = '%#Normal# %{v:lua.Time()}'
-    statuslines[#statuslines + 1] = '%#Normal# %{v:lua.Cpu()}'
+    statuslines[#statuslines + 1] = '%#Normal# %{v:lua.Cpu()} '
+    statuslines[#statuslines + 1] = '%LL[%#DevIconPyi#%{v:lua.Fsize()}%#Normal#] '
     statuslines[#statuslines + 1] = '%#Normal# %=%<'
     statuslines[#statuslines + 1] = '%{&ff}[%{&fenc}] '
-    statuslines[#statuslines + 1] = '%(%l/%L,%c%V%) '
+    statuslines[#statuslines + 1] = '%(%l,%c%V%) '
     statuslines[#statuslines + 1] = '%P'
     vim.opt.statusline = vim.fn.join(statuslines, '')
   end,
