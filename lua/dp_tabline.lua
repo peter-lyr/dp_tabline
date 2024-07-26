@@ -60,15 +60,13 @@ M.window_equal           = {}
 
 M.bufs_root              = 'git'
 
-M.nvim_exe_cpu_usage_exe = B.getcreate_file(B.get_source_dot_dir(M.source), 'nvim_exe_cpu_usage.exe')
-M.nvim_exe_cpu_usage_txt = B.getcreate_file(B.get_source_dot_dir(M.source), 'nvim_exe_cpu_usage.txt')
+M.nvim_exe_cpu_usage_py  = B.getcreate_file(B.get_source_dot_dir(M.source), 'nvim_exe_cpu_usage.py')
+M.nvim_exe_cpu_usage_txt = B.getcreate_temp_file({ 'nvim_exe_cpu_usage', }, 'nvim_exe_cpu_usage-' .. vim.fn.getpid() .. '.txt')
 
-B.system_run('start silent', 'taskkill /f /im "nvim_exe_cpu_usage.exe" & %s && %s %s %s', B.system_cd(M.nvim_exe_cpu_usage_exe), M.nvim_exe_cpu_usage_exe, vim.fn.getpid(), M.nvim_exe_cpu_usage_txt)
-
--- B.system_run('start silent', 'taskkill /f /im "nvim_exe_cpu_usage.exe"')
--- B.set_timeout(5000, function()
---   B.system_run('start silent', '%s && %s %s %s', B.system_cd(M.nvim_exe_cpu_usage_exe), M.nvim_exe_cpu_usage_exe, vim.fn.getpid(), M.nvim_exe_cpu_usage_txt)
--- end)
+if not vim.g.nvim_exe_cpu_usage_running then
+  B.system_run('start silent', '%s && python %s %s %s', B.system_cd(M.nvim_exe_cpu_usage_py), M.nvim_exe_cpu_usage_py, vim.fn.getpid(), M.nvim_exe_cpu_usage_txt)
+end
+vim.g.nvim_exe_cpu_usage_running = 1
 
 function M.get_head_root_tail(file)
   local head_root = B.rep_slash(B.get_proj_root(file))
@@ -86,6 +84,9 @@ function SearchWord()
 end
 
 function Cpu()
+  if vim.fn.filereadable(M.nvim_exe_cpu_usage_txt) == 0 then
+    return '0'
+  end
   local lines = vim.fn.readfile(M.nvim_exe_cpu_usage_txt)
   return vim.fn.trim(vim.fn.join(lines, '')) .. '%'
 end
