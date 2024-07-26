@@ -65,6 +65,11 @@ M.nvim_exe_cpu_usage_txt = B.getcreate_file(B.get_source_dot_dir(M.source), 'nvi
 
 B.system_run('start silent', 'taskkill /f /im "nvim_exe_cpu_usage.exe" & %s && %s %s %s', B.system_cd(M.nvim_exe_cpu_usage_exe), M.nvim_exe_cpu_usage_exe, vim.fn.getpid(), M.nvim_exe_cpu_usage_txt)
 
+-- B.system_run('start silent', 'taskkill /f /im "nvim_exe_cpu_usage.exe"')
+-- B.set_timeout(5000, function()
+--   B.system_run('start silent', '%s && %s %s %s', B.system_cd(M.nvim_exe_cpu_usage_exe), M.nvim_exe_cpu_usage_exe, vim.fn.getpid(), M.nvim_exe_cpu_usage_txt)
+-- end)
+
 function M.get_head_root_tail(file)
   local head_root = B.rep_slash(B.get_proj_root(file))
   if #head_root > 0 then
