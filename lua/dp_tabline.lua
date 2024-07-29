@@ -461,7 +461,7 @@ end
 
 function M.titlestring(ev)
   pcall(vim.call, 'ProjectRootCD')
-  local project = B.rep(vim.fn['ProjectRootGet'](vim.api.nvim_buf_get_name(ev.buf)))
+  local project = B.rep(B.get_file_git_root(vim.api.nvim_buf_get_name(ev.buf)))
   local root_head = B.get_short(B.get_only_name(B.file_parent(project)), 1, '.')
   local root = B.get_short(B.get_only_name(project), 3, '.')
   local branchname = ' ' .. B.get_short(vim.fn['gitbranch#name'](), 5, '.')
