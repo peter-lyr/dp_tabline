@@ -133,6 +133,7 @@ B.aucmd('BufEnter', 'tabline.BufEnter.statusline', {
         temps[#temps + 1] = temp
         file = head
       else
+        B.print("%s|%s|%s", head, root, tail)
         break
       end
     end
@@ -179,7 +180,8 @@ B.aucmd('BufEnter', 'tabline.BufEnter.statusline', {
     statuslines[#statuslines + 1] = '%{&ff}[%{&fenc}] '
     statuslines[#statuslines + 1] = '%(%l,%c%V%) '
     statuslines[#statuslines + 1] = '%P'
-    vim.opt.statusline = vim.fn.join(statuslines, '')
+    local statusline = string.gsub(vim.fn.join(statuslines, ''), '/%%#Normal#/', '/')
+    vim.opt.statusline = statusline
   end,
 })
 
