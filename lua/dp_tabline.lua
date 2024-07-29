@@ -133,7 +133,6 @@ B.aucmd('BufEnter', 'tabline.BufEnter.statusline', {
         temps[#temps + 1] = temp
         file = head
       else
-        B.print("%s|%s|%s", head, root, tail)
         break
       end
     end
