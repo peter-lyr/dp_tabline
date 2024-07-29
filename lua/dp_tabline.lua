@@ -181,6 +181,7 @@ B.aucmd('BufEnter', 'tabline.BufEnter.statusline', {
     statuslines[#statuslines + 1] = '%(%l,%c%V%) '
     statuslines[#statuslines + 1] = '%P'
     local statusline = string.gsub(vim.fn.join(statuslines, ''), '/%%#Normal#/', '/')
+    statusline = string.gsub(statusline, '%%#Normal#/%%#Normal#', '%%#Normal#/')
     vim.opt.statusline = statusline
   end,
 })
